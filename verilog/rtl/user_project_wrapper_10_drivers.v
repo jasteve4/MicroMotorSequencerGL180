@@ -106,21 +106,24 @@ module user_project_wrapper #(
   wire io_update_cycle_complete_out;
   wire io_update_cycle_complete_oeb;
 
-  wire [31:0]                 spi_data;
-  wire                        spi_data_clock;
-
   wire [NUM_OF_DRIVERS-1:0]   io_driver_io_oeb;
   wire [NUM_OF_DRIVERS*2-1:0] driver_io;
 
-  wire  [9:0]                    mem_address_right;
-  wire  [9:0]                    mem_address_left;
+  wire  [2:0]                    mask_select_right;
+  wire  [2:0]                    mask_select_left;
+  wire  [6:0]                    mem_address_right;
+  wire  [6:0]                    mem_address_left;
   wire  [NUM_OF_DRIVERS-1:0]     mem_write_n;
+  wire  [NUM_OF_DRIVERS-1:0]     mem_dot_write_n;
   wire  [MEM_ADDRESS_LENGTH-1:0] row_select_right;
   wire  [MEM_ADDRESS_LENGTH-1:0] row_select_left;
   wire  [MEM_ADDRESS_LENGTH-1:0] col_select_right;
   wire  [MEM_ADDRESS_LENGTH-1:0] col_select_left;
+  wire  [6:0]                    mem_sel_col_address_right;
+  wire  [6:0]                    mem_sel_col_address_left;
   wire  [15:0]                   data_out_right;
   wire  [15:0]                   data_out_left;
+  wire  [NUM_OF_DRIVERS-1:0]     mem_sel_write_n;
   wire  [NUM_OF_DRIVERS-1:0]     row_col_select;
   wire                           output_active_right;
   wire                           output_active_left;
@@ -218,27 +221,8 @@ module user_project_wrapper #(
 //  assign io_out[1]                 = 0;
 //  assign io_out[0]                 = 0;
 
-  spi_controller spi_controller_mod(
-`ifdef USE_POWER_PINS
-    .vccd1                           (vccd1                         ),
-    .vssd1                           (vssd1                         ),
-`endif
-    .clock            (user_clock2),
-    .data_out         (spi_data),
-    .clock_out        (spi_data_clock),
-    .miso             (io_miso_out),
-    .miso_oeb         (io_miso_oeb),
-    .mosi             (io_mosi_in),
-    .mosi_oeb         (io_mosi_oeb),
-    .ss_n             (io_ss_n_in),
-    .ss_n_oeb         (io_ss_n_oeb),
-    .sclk             (io_sclk_in),
-    .sclk_oeb         (io_sclk_oeb),
-    .la_oenb          (la_data_in[35:32]),
-    .la_data_in       (la_oenb[35:32]   )
-  );
 
-  controller_core
+  controller_unit
   #(
 `ifndef SYNTHESIS
     .MEM_LENGTH                     (MEM_LENGTH                    ),
@@ -246,15 +230,16 @@ module user_project_wrapper #(
     .NUM_OF_DRIVERS                 (NUM_OF_DRIVERS                )
 `endif
   )
-  controller_core_mod
+  controller_unit_mod
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .la_data_in                      (la_data_in[7+NUM_OF_DRIVERS:0] ),
-    .la_oenb                         (la_oenb[7+NUM_OF_DRIVERS:0]    ),
-    .clock                           (user_clock2                   ),
+    .la_data_in                      (la_data_in                    ),
+    //.la_data_out                     (la_data_out                   ),
+    .la_oenb                         (la_oenb                       ),
+    .user_clock2                     (user_clock2                   ),
     .io_reset_n_in                   (io_reset_n_in                 ),
     .io_reset_n_oeb                  (io_reset_n_oeb                ),
     .io_latch_data_in                (io_latch_data_in              ),
@@ -264,24 +249,35 @@ module user_project_wrapper #(
     .io_driver_io_oeb                (io_driver_io_oeb              ),
     .io_update_cycle_complete_out    (io_update_cycle_complete_out  ),
     .io_update_cycle_complete_oeb    (io_update_cycle_complete_oeb  ),
+    .io_sclk_in                      (io_sclk_in                    ),
+    .io_sclk_oeb                     (io_sclk_oeb                   ),
+    .io_mosi_in                      (io_mosi_in                    ),
+    .io_mosi_oeb                     (io_mosi_oeb                   ),
+    .io_ss_n_in                      (io_ss_n_in                    ),
+    .io_ss_n_oeb                     (io_ss_n_oeb                   ),
+    .io_miso_out                     (io_miso_out                   ),
+    .io_miso_oeb                     (io_miso_oeb                   ),
 
+    .mask_select_right               (mask_select_right             ),                                        
+    .mask_select_left                (mask_select_left              ),                                      
     .mem_address_right               (mem_address_right             ),                                       
     .mem_address_left                (mem_address_left              ),                                      
     .mem_write_n                     (mem_write_n                   ),                                 
+    .mem_dot_write_n                 (mem_dot_write_n               ),                                     
     .row_select_right                (row_select_right              ),                                      
     .row_select_left                 (row_select_left               ),                                     
     .col_select_right                (col_select_right              ),                                      
     .col_select_left                 (col_select_left               ),                                     
+    .mem_sel_col_address_right       (mem_sel_col_address_right     ),                                               
+    .mem_sel_col_address_left        (mem_sel_col_address_left      ),                                              
     .data_out_right                  (data_out_right                ),                                    
     .data_out_left                   (data_out_left                 ),                                   
+    .mem_sel_write_n                 (mem_sel_write_n               ),                                     
     .row_col_select                  (row_col_select                ),                                    
     .output_active_right             (output_active_right           ),                                         
     .output_active_left              (output_active_left            ),                                        
     .inverter_select                 (inverter_select               ),                                     
-    .clock_out                       (clock_out                     ),
-
-    .spi_data_clock                  (spi_data_clock                ),
-    .spi_data                        (spi_data                      )
+    .clock_out                       (clock_out                     )
      
   );
 
@@ -294,17 +290,21 @@ module user_project_wrapper #(
   )
   driver_core_0
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[0]                 ),
     .clock_a                        (clock_out[0]                 ),
-    .mem_address_a                  (mem_address_left             ),
+    .mask_select_a                  (mask_select_left             ),
+    .mem_address_a                  (mem_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[0]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[0]           ),
     .row_select_a                   (row_select_left              ),
     .col_select_a                   (col_select_left              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_left                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[0]           ),
     .row_col_select_a               (row_col_select[0]            ), 
     .output_active_a                (output_active_left           ),
     .inverter_select_a              (inverter_select[0]           ),
@@ -320,17 +320,21 @@ module user_project_wrapper #(
   )
   driver_core_1
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[1]                 ),
     .clock_a                        (clock_out[1]                 ),
-    .mem_address_a                  (mem_address_left             ),
+    .mask_select_a                  (mask_select_left             ),
+    .mem_address_a                  (mem_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[1]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[1]           ),
     .row_select_a                   (row_select_left              ),
     .col_select_a                   (col_select_left              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_left                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[1]           ),
     .row_col_select_a               (row_col_select[1]            ), 
     .output_active_a                (output_active_left           ),
     .inverter_select_a              (inverter_select[1]           ),
@@ -346,17 +350,21 @@ module user_project_wrapper #(
   )
   driver_core_2
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[2]                 ),
     .clock_a                        (clock_out[2]                 ),
-    .mem_address_a                  (mem_address_left             ),
+    .mask_select_a                  (mask_select_left             ),
+    .mem_address_a                  (mem_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[2]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[2]           ),
     .row_select_a                   (row_select_left              ),
     .col_select_a                   (col_select_left              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_left                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[2]           ),
     .row_col_select_a               (row_col_select[2]            ), 
     .output_active_a                (output_active_left           ),
     .inverter_select_a              (inverter_select[2]           ),
@@ -372,17 +380,21 @@ module user_project_wrapper #(
   )
   driver_core_3
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[3]                 ),
     .clock_a                        (clock_out[3]                 ),
-    .mem_address_a                  (mem_address_left             ),
+    .mask_select_a                  (mask_select_left             ),
+    .mem_address_a                  (mem_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[3]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[3]           ),
     .row_select_a                   (row_select_left              ),
     .col_select_a                   (col_select_left              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_left                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[3]           ),
     .row_col_select_a               (row_col_select[3]            ), 
     .output_active_a                (output_active_left           ),
     .inverter_select_a              (inverter_select[3]           ),
@@ -398,17 +410,21 @@ module user_project_wrapper #(
   )
   driver_core_4
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[4]                 ),
     .clock_a                        (clock_out[4]                 ),
-    .mem_address_a                  (mem_address_left             ),
+    .mask_select_a                  (mask_select_left             ),
+    .mem_address_a                  (mem_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[4]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[4]           ),
     .row_select_a                   (row_select_left              ),
     .col_select_a                   (col_select_left              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_left[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_left                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[4]           ),
     .row_col_select_a               (row_col_select[4]            ), 
     .output_active_a                (output_active_left           ),
     .inverter_select_a              (inverter_select[4]           ),
@@ -424,17 +440,21 @@ module user_project_wrapper #(
   )
   driver_core_5
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[5]                 ),
     .clock_a                        (clock_out[5]                 ),
-    .mem_address_a                  (mem_address_right             ),
+    .mask_select_a                  (mask_select_right             ),
+    .mem_address_a                  (mem_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[5]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[5]           ),
     .row_select_a                   (row_select_right              ),
     .col_select_a                   (col_select_right              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_right                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[5]           ),
     .row_col_select_a               (row_col_select[5]            ), 
     .output_active_a                (output_active_right           ),
     .inverter_select_a              (inverter_select[5]           ),
@@ -450,17 +470,21 @@ module user_project_wrapper #(
   )
   driver_core_6
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[6]                 ),
     .clock_a                        (clock_out[6]                 ),
-    .mem_address_a                  (mem_address_right             ),
+    .mask_select_a                  (mask_select_right             ),
+    .mem_address_a                  (mem_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[6]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[6]           ),
     .row_select_a                   (row_select_right              ),
     .col_select_a                   (col_select_right              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_right                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[6]           ),
     .row_col_select_a               (row_col_select[6]            ), 
     .output_active_a                (output_active_right           ),
     .inverter_select_a              (inverter_select[6]           ),
@@ -476,17 +500,21 @@ module user_project_wrapper #(
   )
   driver_core_7
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[7]                 ),
     .clock_a                        (clock_out[7]                 ),
-    .mem_address_a                  (mem_address_right             ),
+    .mask_select_a                  (mask_select_right             ),
+    .mem_address_a                  (mem_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[7]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[7]           ),
     .row_select_a                   (row_select_right              ),
     .col_select_a                   (col_select_right              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_right                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[7]           ),
     .row_col_select_a               (row_col_select[7]            ), 
     .output_active_a                (output_active_right           ),
     .inverter_select_a              (inverter_select[7]           ),
@@ -502,17 +530,21 @@ module user_project_wrapper #(
   )
   driver_core_8
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[8]                 ),
     .clock_a                        (clock_out[8]                 ),
-    .mem_address_a                  (mem_address_right             ),
+    .mask_select_a                  (mask_select_right             ),
+    .mem_address_a                  (mem_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[8]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[8]           ),
     .row_select_a                   (row_select_right              ),
     .col_select_a                   (col_select_right              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_right                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[8]           ),
     .row_col_select_a               (row_col_select[8]            ), 
     .output_active_a                (output_active_right           ),
     .inverter_select_a              (inverter_select[8]           ),
@@ -528,17 +560,21 @@ module user_project_wrapper #(
   )
   driver_core_9
   (
-`ifdef USE_POWER_PINS
+`ifdef SYNTHESIS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
     .clock                          (clock_out[9]                 ),
     .clock_a                        (clock_out[9]                 ),
-    .mem_address_a                  (mem_address_right             ),
+    .mask_select_a                  (mask_select_right             ),
+    .mem_address_a                  (mem_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .mem_write_n_a                  (mem_write_n[9]               ),
+    .mem_dot_write_n_a              (mem_dot_write_n[9]           ),
     .row_select_a                   (row_select_right              ),
     .col_select_a                   (col_select_right              ),
+    .mem_sel_col_address_a          (mem_sel_col_address_right[MEM_ADDRESS_LENGTH-1:0]),
     .data_in_a                      (data_out_right                ),
+    .mem_sel_write_n_a              (mem_sel_write_n[9]           ),
     .row_col_select_a               (row_col_select[9]            ), 
     .output_active_a                (output_active_right           ),
     .inverter_select_a              (inverter_select[9]           ),
