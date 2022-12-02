@@ -69,7 +69,7 @@ set_output_delay -max $output_delay_value -clock [get_clocks {clock}] -add_delay
 set_output_delay -max $output_delay_value -clock [get_clocks {clock}] -add_delay [get_ports {mem_sel_write_n[*]}]
 set_output_delay -max $output_delay_value -clock [get_clocks {clock}] -add_delay [get_ports {row_col_select[*]}]
 set_output_delay -max $output_delay_value -clock [get_clocks {clock}] -add_delay [get_ports {inverter_select[*]}]
-set_output_delay -max $output_delay_value -clock [get_clocks {clock}] -add_delay [get_ports {clock_out[*]}]
+#set_output_delay -max $output_delay_value -clock [get_clocks {clock}] -add_delay [get_ports {clock_out[*]}]
 
 if { ![info exists ::env(SYNTH_CLK_DRIVING_CELL)] } {
     set ::env(SYNTH_CLK_DRIVING_CELL) $::env(SYNTH_DRIVING_CELL)
@@ -91,6 +91,7 @@ set_driving_cell -lib_cell $::env(SYNTH_DRIVING_CELL) -pin $::env(SYNTH_DRIVING_
 
 set_driving_cell -lib_cell $::env(SYNTH_CLK_DRIVING_CELL) -pin $::env(SYNTH_CLK_DRIVING_CELL_PIN) [get_ports {clock}]
 set_driving_cell -lib_cell $::env(SYNTH_CLK_DRIVING_CELL) -pin $::env(SYNTH_CLK_DRIVING_CELL_PIN) [get_ports {spi_data_clock}]
+set_driving_cell -lib_cell $::env(SYNTH_CLK_DRIVING_CELL) -pin $::env(SYNTH_CLK_DRIVING_CELL_PIN) [get_ports {clock_out[*]}]
 
 set cap_load [expr $::env(SYNTH_CAP_LOAD) / 1000.0]
 puts "\[INFO\]: Setting load to: $cap_load"

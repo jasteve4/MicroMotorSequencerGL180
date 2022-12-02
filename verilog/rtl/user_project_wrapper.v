@@ -109,7 +109,7 @@ module user_project_wrapper #(
   wire [31:0]                 spi_data;
   wire                        spi_data_clock;
 
-  wire [NUM_OF_DRIVERS-1:0]   io_driver_io_oeb;
+  wire [NUM_OF_DRIVERS*2-1:0]   io_driver_io_oeb;
   wire [NUM_OF_DRIVERS*2-1:0] driver_io;
 
   wire  [9:0]                    mem_address_right;
@@ -157,27 +157,27 @@ module user_project_wrapper #(
 
   
   assign io_oeb[29]                 = io_driver_io_oeb[0];
-  assign io_oeb[28]                 = io_driver_io_oeb[0];
-  assign io_oeb[27]                 = io_driver_io_oeb[1];
-  assign io_oeb[26]                 = io_driver_io_oeb[1];
-  assign io_oeb[25]                 = io_driver_io_oeb[2];
-  assign io_oeb[24]                 = io_driver_io_oeb[2];
-  assign io_oeb[23]                 = io_driver_io_oeb[3];
-  assign io_oeb[22]                 = io_driver_io_oeb[3];
-  assign io_oeb[21]                 = io_driver_io_oeb[4];
-  assign io_oeb[20]                 = io_driver_io_oeb[4];
+  assign io_oeb[28]                 = io_driver_io_oeb[1];
+  assign io_oeb[27]                 = io_driver_io_oeb[2];
+  assign io_oeb[26]                 = io_driver_io_oeb[3];
+  assign io_oeb[25]                 = io_driver_io_oeb[4];
+  assign io_oeb[24]                 = io_driver_io_oeb[5];
+  assign io_oeb[23]                 = io_driver_io_oeb[6];
+  assign io_oeb[22]                 = io_driver_io_oeb[7];
+  assign io_oeb[21]                 = io_driver_io_oeb[8];
+  assign io_oeb[20]                 = io_driver_io_oeb[9];
 //  assign io_oeb[19]                 = 0;
 //  assign io_oeb[18]                 = 0;
-  assign io_oeb[17]                 = io_driver_io_oeb[5];
-  assign io_oeb[16]                 = io_driver_io_oeb[5];
-  assign io_oeb[15]                 = io_driver_io_oeb[6];
-  assign io_oeb[14]                 = io_driver_io_oeb[6];
-  assign io_oeb[13]                 = io_driver_io_oeb[7];
-  assign io_oeb[12]                 = io_driver_io_oeb[7];
-  assign io_oeb[11]                 = io_driver_io_oeb[8];
-  assign io_oeb[10]                 = io_driver_io_oeb[8];
-  assign io_oeb[9]                  = io_driver_io_oeb[9];
-  assign io_oeb[8]                  = io_driver_io_oeb[9];
+  assign io_oeb[17]                 = io_driver_io_oeb[10];
+  assign io_oeb[16]                 = io_driver_io_oeb[11];
+  assign io_oeb[15]                 = io_driver_io_oeb[12];
+  assign io_oeb[14]                 = io_driver_io_oeb[13];
+  assign io_oeb[13]                 = io_driver_io_oeb[14];
+  assign io_oeb[12]                 = io_driver_io_oeb[15];
+  assign io_oeb[11]                 = io_driver_io_oeb[16];
+  assign io_oeb[10]                 = io_driver_io_oeb[17];
+  assign io_oeb[9]                  = io_driver_io_oeb[18];
+  assign io_oeb[8]                  = io_driver_io_oeb[19];
 //  assign io_oeb[7]                 = 0;
 //  assign io_oeb[6]                 = 0;
 //  assign io_oeb[5]                 = 0;

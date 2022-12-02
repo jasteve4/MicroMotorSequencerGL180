@@ -46,7 +46,7 @@ module controller_core
   output reg                        io_latch_data_oeb,
   input  wire                       io_control_trigger_in,
   output reg                        io_control_trigger_oeb,
-  output reg [NUM_OF_DRIVERS-1:0]   io_driver_io_oeb,
+  output reg [2*NUM_OF_DRIVERS-1:0]   io_driver_io_oeb,
   output reg                        io_update_cycle_complete_out,
   output reg                        io_update_cycle_complete_oeb,
 
@@ -157,7 +157,8 @@ module controller_core
   begin : gen_io_driver
     always@(posedge clock)
     begin
-      io_driver_io_oeb[I]            = (~la_oenb[8+I]) ? la_data_in[8+I] : 1'b0;
+      io_driver_io_oeb[2*I]            = (~la_oenb[8+I]) ? la_data_in[8+I] : 1'b0;
+      io_driver_io_oeb[2*I+1]            = (~la_oenb[8+I]) ? la_data_in[8+I] : 1'b0;
     end
     assign clock_out[I] = clock;
   end
