@@ -45,6 +45,11 @@
 + spi_data_clock vccd1 vssd1
 .ends
 
+* Black-box entry subcircuit for clock_source_sel abstract view
+.subckt clock_source_sel clock_out_a clock_out_b clock_out_c core_clock io_clock la_oenb
++ vccd1 vssd1
+.ends
+
 * Black-box entry subcircuit for spi_controller abstract view
 .subckt spi_controller clock clock_out data_out[0] data_out[10] data_out[11] data_out[12]
 + data_out[13] data_out[14] data_out[15] data_out[16] data_out[17] data_out[18] data_out[19]
@@ -168,7 +173,7 @@
 + wbs_dat_o[28] wbs_dat_o[29] wbs_dat_o[2] wbs_dat_o[30] wbs_dat_o[31] wbs_dat_o[3]
 + wbs_dat_o[4] wbs_dat_o[5] wbs_dat_o[6] wbs_dat_o[7] wbs_dat_o[8] wbs_dat_o[9] wbs_sel_i[0]
 + wbs_sel_i[1] wbs_sel_i[2] wbs_sel_i[3] wbs_stb_i wbs_we_i
-Xcontroller_core_mod user_clock2 clock_out\[0\] clock_out\[1\] clock_out\[2\] clock_out\[3\]
+Xcontroller_core_mod clock_out_c clock_out\[0\] clock_out\[1\] clock_out\[2\] clock_out\[3\]
 + clock_out\[4\] clock_out\[5\] clock_out\[6\] clock_out\[7\] clock_out\[8\] clock_out\[9\]
 + col_select_left\[0\] col_select_left\[1\] col_select_left\[2\] col_select_left\[3\]
 + col_select_left\[4\] col_select_left\[5\] col_select_right\[0\] col_select_right\[1\]
@@ -211,16 +216,18 @@ Xcontroller_core_mod user_clock2 clock_out\[0\] clock_out\[1\] clock_out\[2\] cl
 + spi_data\[27\] spi_data\[28\] spi_data\[29\] spi_data\[2\] spi_data\[30\] spi_data\[31\]
 + spi_data\[3\] spi_data\[4\] spi_data\[5\] spi_data\[6\] spi_data\[7\] spi_data\[8\]
 + spi_data\[9\] spi_data_clock vccd1 vssd1 controller_core
-Xspi_controller_mod user_clock2 spi_data_clock spi_data\[0\] spi_data\[10\] spi_data\[11\]
+Xclock_sel clock_out_a clock_out_b clock_out_c user_clock2 io_in[8] la_oenb[63] clock_sel/vccd1
++ clock_sel/vssd1 clock_source_sel
+Xspi_controller_mod clock_out_c spi_data_clock spi_data\[0\] spi_data\[10\] spi_data\[11\]
 + spi_data\[12\] spi_data\[13\] spi_data\[14\] spi_data\[15\] spi_data\[16\] spi_data\[17\]
 + spi_data\[18\] spi_data\[19\] spi_data\[1\] spi_data\[20\] spi_data\[21\] spi_data\[22\]
 + spi_data\[23\] spi_data\[24\] spi_data\[25\] spi_data\[26\] spi_data\[27\] spi_data\[28\]
 + spi_data\[29\] spi_data\[2\] spi_data\[30\] spi_data\[31\] spi_data\[3\] spi_data\[4\]
-+ spi_data\[5\] spi_data\[6\] spi_data\[7\] spi_data\[8\] spi_data\[9\] la_oenb[32]
-+ la_oenb[33] la_oenb[34] la_oenb[35] la_data_in[32] la_data_in[33] la_data_in[34]
-+ la_data_in[35] io_out[34] io_oeb[34] io_in[33] io_oeb[33] io_in[31] io_oeb[31] io_in[32]
++ spi_data\[5\] spi_data\[6\] spi_data\[7\] spi_data\[8\] spi_data\[9\] la_data_in[17]
++ la_data_in[18] la_data_in[19] la_data_in[20] la_oenb[17] la_oenb[18] la_oenb[19]
++ la_oenb[20] io_out[34] io_oeb[34] io_in[33] io_oeb[33] io_in[31] io_oeb[31] io_in[32]
 + io_oeb[32] spi_controller_mod/vccd1 spi_controller_mod/vssd1 spi_controller
-Xdriver_core_0 clock_out\[0\] clock_out\[0\] col_select_left\[0\] col_select_left\[1\]
+Xdriver_core_0 clock_out_c clock_out\[0\] col_select_left\[0\] col_select_left\[1\]
 + col_select_left\[2\] col_select_left\[3\] col_select_left\[4\] col_select_left\[5\]
 + data_out_left\[0\] data_out_left\[10\] data_out_left\[11\] data_out_left\[12\] data_out_left\[13\]
 + data_out_left\[14\] data_out_left\[15\] data_out_left\[1\] data_out_left\[2\] data_out_left\[3\]
@@ -231,7 +238,7 @@ Xdriver_core_0 clock_out\[0\] clock_out\[0\] col_select_left\[0\] col_select_lef
 + mem_address_left\[9\] mem_write_n\[0\] output_active_left row_col_select\[0\] row_select_left\[0\]
 + row_select_left\[1\] row_select_left\[2\] row_select_left\[3\] row_select_left\[4\]
 + row_select_left\[5\] driver_core_0/vccd1 driver_core_0/vssd1 driver_core
-Xdriver_core_1 clock_out\[1\] clock_out\[1\] col_select_left\[0\] col_select_left\[1\]
+Xdriver_core_1 clock_out_a clock_out\[1\] col_select_left\[0\] col_select_left\[1\]
 + col_select_left\[2\] col_select_left\[3\] col_select_left\[4\] col_select_left\[5\]
 + data_out_left\[0\] data_out_left\[10\] data_out_left\[11\] data_out_left\[12\] data_out_left\[13\]
 + data_out_left\[14\] data_out_left\[15\] data_out_left\[1\] data_out_left\[2\] data_out_left\[3\]
@@ -242,7 +249,7 @@ Xdriver_core_1 clock_out\[1\] clock_out\[1\] col_select_left\[0\] col_select_lef
 + mem_address_left\[9\] mem_write_n\[1\] output_active_left row_col_select\[1\] row_select_left\[0\]
 + row_select_left\[1\] row_select_left\[2\] row_select_left\[3\] row_select_left\[4\]
 + row_select_left\[5\] driver_core_1/vccd1 driver_core_1/vssd1 driver_core
-Xdriver_core_2 clock_out\[2\] clock_out\[2\] col_select_left\[0\] col_select_left\[1\]
+Xdriver_core_2 clock_out_a clock_out\[2\] col_select_left\[0\] col_select_left\[1\]
 + col_select_left\[2\] col_select_left\[3\] col_select_left\[4\] col_select_left\[5\]
 + data_out_left\[0\] data_out_left\[10\] data_out_left\[11\] data_out_left\[12\] data_out_left\[13\]
 + data_out_left\[14\] data_out_left\[15\] data_out_left\[1\] data_out_left\[2\] data_out_left\[3\]
@@ -253,7 +260,7 @@ Xdriver_core_2 clock_out\[2\] clock_out\[2\] col_select_left\[0\] col_select_lef
 + mem_address_left\[9\] mem_write_n\[2\] output_active_left row_col_select\[2\] row_select_left\[0\]
 + row_select_left\[1\] row_select_left\[2\] row_select_left\[3\] row_select_left\[4\]
 + row_select_left\[5\] driver_core_2/vccd1 driver_core_2/vssd1 driver_core
-Xdriver_core_3 clock_out\[3\] clock_out\[3\] col_select_left\[0\] col_select_left\[1\]
+Xdriver_core_3 clock_out_a clock_out\[3\] col_select_left\[0\] col_select_left\[1\]
 + col_select_left\[2\] col_select_left\[3\] col_select_left\[4\] col_select_left\[5\]
 + data_out_left\[0\] data_out_left\[10\] data_out_left\[11\] data_out_left\[12\] data_out_left\[13\]
 + data_out_left\[14\] data_out_left\[15\] data_out_left\[1\] data_out_left\[2\] data_out_left\[3\]
@@ -264,7 +271,7 @@ Xdriver_core_3 clock_out\[3\] clock_out\[3\] col_select_left\[0\] col_select_lef
 + mem_address_left\[9\] mem_write_n\[3\] output_active_left row_col_select\[3\] row_select_left\[0\]
 + row_select_left\[1\] row_select_left\[2\] row_select_left\[3\] row_select_left\[4\]
 + row_select_left\[5\] driver_core_3/vccd1 driver_core_3/vssd1 driver_core
-Xdriver_core_4 clock_out\[4\] clock_out\[4\] col_select_left\[0\] col_select_left\[1\]
+Xdriver_core_4 clock_out_a clock_out\[4\] col_select_left\[0\] col_select_left\[1\]
 + col_select_left\[2\] col_select_left\[3\] col_select_left\[4\] col_select_left\[5\]
 + data_out_left\[0\] data_out_left\[10\] data_out_left\[11\] data_out_left\[12\] data_out_left\[13\]
 + data_out_left\[14\] data_out_left\[15\] data_out_left\[1\] data_out_left\[2\] data_out_left\[3\]
@@ -275,61 +282,61 @@ Xdriver_core_4 clock_out\[4\] clock_out\[4\] col_select_left\[0\] col_select_lef
 + mem_address_left\[9\] mem_write_n\[4\] output_active_left row_col_select\[4\] row_select_left\[0\]
 + row_select_left\[1\] row_select_left\[2\] row_select_left\[3\] row_select_left\[4\]
 + row_select_left\[5\] driver_core_4/vccd1 driver_core_4/vssd1 driver_core
-Xdriver_core_5 clock_out\[5\] clock_out\[5\] col_select_right\[0\] col_select_right\[1\]
+Xdriver_core_5 clock_out_b clock_out\[5\] col_select_right\[0\] col_select_right\[1\]
 + col_select_right\[2\] col_select_right\[3\] col_select_right\[4\] col_select_right\[5\]
 + data_out_right\[0\] data_out_right\[10\] data_out_right\[11\] data_out_right\[12\]
 + data_out_right\[13\] data_out_right\[14\] data_out_right\[15\] data_out_right\[1\]
 + data_out_right\[2\] data_out_right\[3\] data_out_right\[4\] data_out_right\[5\]
 + data_out_right\[6\] data_out_right\[7\] data_out_right\[8\] data_out_right\[9\]
-+ io_out[17] io_out[16] inverter_select\[5\] mem_address_right\[0\] mem_address_right\[1\]
++ io_out[18] io_out[17] inverter_select\[5\] mem_address_right\[0\] mem_address_right\[1\]
 + mem_address_right\[2\] mem_address_right\[3\] mem_address_right\[4\] mem_address_right\[5\]
 + mem_address_right\[6\] mem_address_right\[7\] mem_address_right\[8\] mem_address_right\[9\]
 + mem_write_n\[5\] output_active_right row_col_select\[5\] row_select_right\[0\] row_select_right\[1\]
 + row_select_right\[2\] row_select_right\[3\] row_select_right\[4\] row_select_right\[5\]
 + driver_core_5/vccd1 driver_core_5/vssd1 driver_core
-Xdriver_core_6 clock_out\[6\] clock_out\[6\] col_select_right\[0\] col_select_right\[1\]
+Xdriver_core_6 clock_out_b clock_out\[6\] col_select_right\[0\] col_select_right\[1\]
 + col_select_right\[2\] col_select_right\[3\] col_select_right\[4\] col_select_right\[5\]
 + data_out_right\[0\] data_out_right\[10\] data_out_right\[11\] data_out_right\[12\]
 + data_out_right\[13\] data_out_right\[14\] data_out_right\[15\] data_out_right\[1\]
 + data_out_right\[2\] data_out_right\[3\] data_out_right\[4\] data_out_right\[5\]
 + data_out_right\[6\] data_out_right\[7\] data_out_right\[8\] data_out_right\[9\]
-+ io_out[15] io_out[14] inverter_select\[6\] mem_address_right\[0\] mem_address_right\[1\]
++ io_out[16] io_out[15] inverter_select\[6\] mem_address_right\[0\] mem_address_right\[1\]
 + mem_address_right\[2\] mem_address_right\[3\] mem_address_right\[4\] mem_address_right\[5\]
 + mem_address_right\[6\] mem_address_right\[7\] mem_address_right\[8\] mem_address_right\[9\]
 + mem_write_n\[6\] output_active_right row_col_select\[6\] row_select_right\[0\] row_select_right\[1\]
 + row_select_right\[2\] row_select_right\[3\] row_select_right\[4\] row_select_right\[5\]
 + driver_core_6/vccd1 driver_core_6/vssd1 driver_core
-Xdriver_core_7 clock_out\[7\] clock_out\[7\] col_select_right\[0\] col_select_right\[1\]
+Xdriver_core_7 clock_out_b clock_out\[7\] col_select_right\[0\] col_select_right\[1\]
 + col_select_right\[2\] col_select_right\[3\] col_select_right\[4\] col_select_right\[5\]
 + data_out_right\[0\] data_out_right\[10\] data_out_right\[11\] data_out_right\[12\]
 + data_out_right\[13\] data_out_right\[14\] data_out_right\[15\] data_out_right\[1\]
 + data_out_right\[2\] data_out_right\[3\] data_out_right\[4\] data_out_right\[5\]
 + data_out_right\[6\] data_out_right\[7\] data_out_right\[8\] data_out_right\[9\]
-+ io_out[13] io_out[12] inverter_select\[7\] mem_address_right\[0\] mem_address_right\[1\]
++ io_out[14] io_out[13] inverter_select\[7\] mem_address_right\[0\] mem_address_right\[1\]
 + mem_address_right\[2\] mem_address_right\[3\] mem_address_right\[4\] mem_address_right\[5\]
 + mem_address_right\[6\] mem_address_right\[7\] mem_address_right\[8\] mem_address_right\[9\]
 + mem_write_n\[7\] output_active_right row_col_select\[7\] row_select_right\[0\] row_select_right\[1\]
 + row_select_right\[2\] row_select_right\[3\] row_select_right\[4\] row_select_right\[5\]
 + driver_core_7/vccd1 driver_core_7/vssd1 driver_core
-Xdriver_core_8 clock_out\[8\] clock_out\[8\] col_select_right\[0\] col_select_right\[1\]
+Xdriver_core_8 clock_out_b clock_out\[8\] col_select_right\[0\] col_select_right\[1\]
 + col_select_right\[2\] col_select_right\[3\] col_select_right\[4\] col_select_right\[5\]
 + data_out_right\[0\] data_out_right\[10\] data_out_right\[11\] data_out_right\[12\]
 + data_out_right\[13\] data_out_right\[14\] data_out_right\[15\] data_out_right\[1\]
 + data_out_right\[2\] data_out_right\[3\] data_out_right\[4\] data_out_right\[5\]
 + data_out_right\[6\] data_out_right\[7\] data_out_right\[8\] data_out_right\[9\]
-+ io_out[11] io_out[10] inverter_select\[8\] mem_address_right\[0\] mem_address_right\[1\]
++ io_out[12] io_out[11] inverter_select\[8\] mem_address_right\[0\] mem_address_right\[1\]
 + mem_address_right\[2\] mem_address_right\[3\] mem_address_right\[4\] mem_address_right\[5\]
 + mem_address_right\[6\] mem_address_right\[7\] mem_address_right\[8\] mem_address_right\[9\]
 + mem_write_n\[8\] output_active_right row_col_select\[8\] row_select_right\[0\] row_select_right\[1\]
 + row_select_right\[2\] row_select_right\[3\] row_select_right\[4\] row_select_right\[5\]
 + driver_core_8/vccd1 driver_core_8/vssd1 driver_core
-Xdriver_core_9 clock_out\[9\] clock_out\[9\] col_select_right\[0\] col_select_right\[1\]
+Xdriver_core_9 clock_out_c clock_out\[9\] col_select_right\[0\] col_select_right\[1\]
 + col_select_right\[2\] col_select_right\[3\] col_select_right\[4\] col_select_right\[5\]
 + data_out_right\[0\] data_out_right\[10\] data_out_right\[11\] data_out_right\[12\]
 + data_out_right\[13\] data_out_right\[14\] data_out_right\[15\] data_out_right\[1\]
 + data_out_right\[2\] data_out_right\[3\] data_out_right\[4\] data_out_right\[5\]
 + data_out_right\[6\] data_out_right\[7\] data_out_right\[8\] data_out_right\[9\]
-+ io_out[9] io_out[8] inverter_select\[9\] mem_address_right\[0\] mem_address_right\[1\]
++ io_out[10] io_out[9] inverter_select\[9\] mem_address_right\[0\] mem_address_right\[1\]
 + mem_address_right\[2\] mem_address_right\[3\] mem_address_right\[4\] mem_address_right\[5\]
 + mem_address_right\[6\] mem_address_right\[7\] mem_address_right\[8\] mem_address_right\[9\]
 + mem_write_n\[9\] output_active_right row_col_select\[9\] row_select_right\[0\] row_select_right\[1\]

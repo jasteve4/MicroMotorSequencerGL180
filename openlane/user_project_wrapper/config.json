@@ -4,6 +4,10 @@
     "CLOCK_PERIOD": 150,
     "CLOCK_PORT": "user_clock2",
     "CLOCK_NET": [ "user_clock2", 
+	    "io_in[8]",
+	    "clock_out_a",
+	    "clock_out_b",
+	    "clock_out_c",
 	    "clock_out[0]", 
 	    "clock_out[1]", 
 	    "controller_unit_mod.clock_out[2]",
@@ -31,14 +35,17 @@
     "VERILOG_FILES_BLACKBOX": [
 	    "dir::../../verilog/gl/controller_core.v", 
 	    "dir::../../verilog/gl/spi_controller.v",
+	    "dir::../../verilog/gl/clock_source_sel.v",
 	    "dir::../../verilog/gl/driver_core.v"],
     "EXTRA_LEFS": [
 	    "dir::../../lef/controller_core.lef", 
 	    "dir::../../lef/spi_controller.lef",
+	    "dir::../../lef/clock_source_sel.lef",
 	    "dir::../../lef/driver_core.lef"],
     "EXTRA_GDS_FILES": [
 	    "dir::../../gds/controller_core.gds", 
 	    "dir::../../gds/spi_controller.gds",
+	    "dir::../../gds/clock_source_sel.gds",
 	    "dir::../../gds/driver_core.gds"],
     "FP_PDN_CHECK_NODES": 0,
     "SYNTH_ELABORATE_ONLY": 1,

@@ -128,6 +128,13 @@ module user_project_wrapper #(
   // clock fanout reduction
   wire [NUM_OF_DRIVERS-1:0]      clock_out;
 
+  wire core_clock;
+  wire io_clock;
+  wire la_oenb_temp;
+  wire  clock_out_a;
+  wire  clock_out_b;
+  wire  clock_out_c;
+
   assign io_reset_n_in              = io_in[37];
   assign io_oeb[37]                 = io_reset_n_oeb;
 //  assign io_out[37]                 =0;
@@ -198,17 +205,18 @@ module user_project_wrapper #(
   assign io_out[21]                 = driver_io[8];
   assign io_out[20]                 = driver_io[9];
 //  assign io_out[19]                 = 0;
-//  assign io_out[18]                 = 0;
-  assign io_out[17]                 = driver_io[10];
-  assign io_out[16]                 = driver_io[11];
-  assign io_out[15]                 = driver_io[12];
-  assign io_out[14]                 = driver_io[13];
-  assign io_out[13]                 = driver_io[14];
-  assign io_out[12]                 = driver_io[15];
-  assign io_out[11]                 = driver_io[16];
-  assign io_out[10]                 = driver_io[17];
-  assign io_out[9]                  = driver_io[18];
-  assign io_out[8]                  = driver_io[19];
+  assign io_out[18]                 = driver_io[10];
+  assign io_out[17]                 = driver_io[11];
+  assign io_out[16]                 = driver_io[12];
+  assign io_out[15]                 = driver_io[13];
+  assign io_out[14]                 = driver_io[14];
+  assign io_out[13]                 = driver_io[15];
+  assign io_out[12]                 = driver_io[16];
+  assign io_out[11]                 = driver_io[17];
+  assign io_out[10]                  = driver_io[18];
+  assign io_out[9]                  = driver_io[19];
+  assign io_clock                   = io_in[8];
+  //assign 
 //  assign io_out[7]                 = 0;
 //  assign io_out[6]                 = 0;
 //  assign io_out[5]                 = 0;
@@ -217,13 +225,27 @@ module user_project_wrapper #(
 //  assign io_out[2]                 = 0;
 //  assign io_out[1]                 = 0;
 //  assign io_out[0]                 = 0;
+//
+
+  clock_source_sel clock_sel(
+`ifdef USE_POWER_PINS
+    .vccd1                           (vccd1                         ),
+    .vssd1                           (vssd1                         ),
+`endif
+    .core_clock                      (user_clock2                    ),
+    .io_clock                        (io_clock                      ),
+    .la_oenb                         (la_oenb[63]                   ),
+    .clock_out_a                     (clock_out_a                   ),
+    .clock_out_b                     (clock_out_b                   ),
+    .clock_out_c                     (clock_out_c                   )
+  );
 
   spi_controller spi_controller_mod(
 `ifdef USE_POWER_PINS
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock            (user_clock2),
+    .clock            (clock_out_c),
     .data_out         (spi_data),
     .clock_out        (spi_data_clock),
     .miso             (io_miso_out),
@@ -234,8 +256,8 @@ module user_project_wrapper #(
     .ss_n_oeb         (io_ss_n_oeb),
     .sclk             (io_sclk_in),
     .sclk_oeb         (io_sclk_oeb),
-    .la_oenb          (la_data_in[35:32]),
-    .la_data_in       (la_oenb[35:32]   )
+    .la_oenb          (la_oenb[NUM_OF_DRIVERS+10:NUM_OF_DRIVERS+7]),
+    .la_data_in       (la_data_in[NUM_OF_DRIVERS+10:NUM_OF_DRIVERS+7]   )
   );
 
   controller_core
@@ -252,9 +274,11 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .la_data_in                      (la_data_in[7+NUM_OF_DRIVERS:0] ),
-    .la_oenb                         (la_oenb[7+NUM_OF_DRIVERS:0]    ),
-    .clock                           (user_clock2                   ),
+    //.la_data_in                      (la_data_in[NUM_OF_DRIVERS+7+4:4] ),
+    //.la_oenb                         (la_oenb[NUM_OF_DRIVERS+7+4:4]    ),
+    .la_data_in                      (la_data_in[NUM_OF_DRIVERS+7:0] ),
+    .la_oenb                         (la_oenb[NUM_OF_DRIVERS+7:0]    ),
+    .clock                           (clock_out_c                   ),
     .io_reset_n_in                   (io_reset_n_in                 ),
     .io_reset_n_oeb                  (io_reset_n_oeb                ),
     .io_latch_data_in                (io_latch_data_in              ),
@@ -298,7 +322,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[0]                 ),
+    .clock                          (clock_out_c                 ),
     .clock_a                        (clock_out[0]                 ),
     .mem_address_a                  (mem_address_left             ),
     .mem_write_n_a                  (mem_write_n[0]               ),
@@ -324,7 +348,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[1]                 ),
+    .clock                          (clock_out_a                 ),
     .clock_a                        (clock_out[1]                 ),
     .mem_address_a                  (mem_address_left             ),
     .mem_write_n_a                  (mem_write_n[1]               ),
@@ -350,7 +374,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[2]                 ),
+    .clock                          (clock_out_a                 ),
     .clock_a                        (clock_out[2]                 ),
     .mem_address_a                  (mem_address_left             ),
     .mem_write_n_a                  (mem_write_n[2]               ),
@@ -376,7 +400,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[3]                 ),
+    .clock                          (clock_out_a                 ),
     .clock_a                        (clock_out[3]                 ),
     .mem_address_a                  (mem_address_left             ),
     .mem_write_n_a                  (mem_write_n[3]               ),
@@ -402,7 +426,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[4]                 ),
+    .clock                          (clock_out_a                 ),
     .clock_a                        (clock_out[4]                 ),
     .mem_address_a                  (mem_address_left             ),
     .mem_write_n_a                  (mem_write_n[4]               ),
@@ -428,7 +452,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[5]                 ),
+    .clock                          (clock_out_b                 ),
     .clock_a                        (clock_out[5]                 ),
     .mem_address_a                  (mem_address_right             ),
     .mem_write_n_a                  (mem_write_n[5]               ),
@@ -454,7 +478,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[6]                 ),
+    .clock                          (clock_out_b                 ),
     .clock_a                        (clock_out[6]                 ),
     .mem_address_a                  (mem_address_right             ),
     .mem_write_n_a                  (mem_write_n[6]               ),
@@ -480,7 +504,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[7]                 ),
+    .clock                          (clock_out_b                 ),
     .clock_a                        (clock_out[7]                 ),
     .mem_address_a                  (mem_address_right             ),
     .mem_write_n_a                  (mem_write_n[7]               ),
@@ -506,7 +530,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[8]                 ),
+    .clock                          (clock_out_b                 ),
     .clock_a                        (clock_out[8]                 ),
     .mem_address_a                  (mem_address_right             ),
     .mem_write_n_a                  (mem_write_n[8]               ),
@@ -518,7 +542,7 @@ module user_project_wrapper #(
     .inverter_select_a              (inverter_select[8]           ),
     .driver_io                      (driver_io[17:16]             )
   );
-
+ 
   driver_core
   #(
 `ifndef SYNTHESIS
@@ -532,7 +556,7 @@ module user_project_wrapper #(
     .vccd1                           (vccd1                         ),
     .vssd1                           (vssd1                         ),
 `endif
-    .clock                          (clock_out[9]                 ),
+    .clock                          (clock_out_c                 ),
     .clock_a                        (clock_out[9]                 ),
     .mem_address_a                  (mem_address_right             ),
     .mem_write_n_a                  (mem_write_n[9]               ),
